@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ভিডিও মকআপ</title>
+<style>
+:root{--bg:#f4f5f7;--card:#fff;--tx:#16181d;--mu:#6b7280;--ac:#4f46e5;--bd:#e3e5ea;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101216;--card:#1a1d24;--tx:#eceef2;--mu:#9aa1ae;--ac:#818cf8;--bd:#2a2e38}}
+html{height:100%}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif;min-height:100%}
+main{max-width:520px;margin:0 auto;padding:16px}
+h1{font-size:20px;margin:4px 0 14px}
+.stage{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:10px;display:flex;justify-content:center}
+canvas{max-width:100%;max-height:58vh;border-radius:10px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px;margin-top:12px}
+label{display:block;font-size:13px;color:var(--mu);margin:10px 0 6px}
+label:first-child{margin-top:0}
+select,button,.btn{font:inherit;font-size:15px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);padding:10px 12px}
+select{width:100%}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sw{width:34px;height:34px;border-radius:50%;border:2px solid var(--bd);padding:0;cursor:pointer}
+.sw.on{outline:3px solid var(--ac);outline-offset:2px}
+input[type=color]{width:44px;height:36px;padding:0;border:1px solid var(--bd);border-radius:8px;background:none}
+.pri{background:var(--ac);color:#fff;border:0;font-weight:600;flex:1}
+.pri:disabled{opacity:.5}
+.btn{display:inline-block;text-align:center;cursor:pointer;flex:1;font-weight:600}
+input[type=file]{display:none}
+.bar{height:6px;background:var(--bd);border-radius:3px;margin-top:10px;overflow:hidden;display:none}
+.bar i{display:block;height:100%;width:0;background:var(--ac)}
+.note{font-size:12px;color:var(--mu);margin:8px 0 0}
+</style>
+</head>
+<body>
+<main>
+<h1>📱 ভিডিও ফোন মকআপ</h1>
+<div class="stage"><canvas id="cv"></canvas></div>
+
+<div class="card">
+<div class="row">
+<label class="btn pri" style="margin:0;color:#fff">🎬 ভিডিও আপলোড<input type="file" id="f" accept="video/*"></label>
+<button id="pp">⏯ প্লে/পজ</button>
+</div>
+<label>ফোন মডেল</label>
+<select id="dev">
+<option value="18pm">iPhone 18 Pro Max</option>
+<option value="16pm">iPhone 16 Pro Max</option>
+<option value="15pm">iPhone 15 Pro Max</option>
+<option value="14pm">iPhone 14 Pro Max</option>
+</select>
+<label>ফ্রেমের রং</label>
+<div class="row" id="fc"></div>
+<label>ব্যাকগ্রাউন্ড</label>
+<div class="row"><input type="color" id="bg" value="#e9ecf5"><input type="color" id="bg2" value="#c7d2fe"><span class="note" style="margin:0">গ্রেডিয়েন্টের দুই রং</span></div>
+<label>আউটপুট সাইজ</label>
+<select id="sz">
+<option value="1080x1920">৯:১৬ (রিলস/শর্টস)</option>
+<option value="1080x1080">১:১ (স্কয়ার)</option>
+<option value="1920x1080">১৬:৯ (ইউটিউব)</option>
+</select>
+</div>
+
+<div class="card">
+<div class="row"><button class="pri" id="dl" disabled>⬇ ভিডিও ডাউনলোড</button></div>
+<div class="bar" id="bar"><i id="bi"></i></div>
+<p class="note" id="st">প্রথমে একটা ভিডিও আপলোড করো।</p>
+<p class="note">ডাউনলোডের সময় ভিডিওটা শুরু থেকে শেষ পর্যন্ত রেকর্ড হয়, তাই ভিডিও যত লম্বা সময়ও তত লাগবে। রেকর্ড চলাকালীন ট্যাব খোলা রাখো।</p>
+</div>
+</main>
+<script>
+var D={
+'18pm':{w:440,h:956,r:64,iw:104,ih:32},
+'16pm':{w:440,h:956,r:62,iw:120,ih:35},
+'15pm':{w:430,h:932,r:55,iw:120,ih:35},
+'14pm':{w:430,h:932,r:55,iw:120,ih:35}};
+var FR={'ব্ল্যাক':'#1c1c1f','সিলভার':'#d8d9dc','ন্যাচারাল':'#b9ada0','ব্লু':'#3b4a5f','ডেজার্ট':'#c9a98a'};
+var cv=document.getElementById('cv'),x=cv.getContext('2d');
+var v=document.createElement('video');v.playsInline=true;v.loop=true;v.preload='auto';
+var W=1080,H=1920,frame='#1c1c1f',ac,g,dest,rec=false;
+var $=function(i){return document.getElementById(i)};
+
+function setSize(){var s=$('sz').value.split('x');W=+s[0];H=+s[1];cv.width=W;cv.height=H}
+function rr(a,b,w,h,r){x.beginPath();x.roundRect(a,b,w,h,r)}
+
+function draw(){
+ var gr=x.createLinearGradient(0,0,W,H);gr.addColorStop(0,$('bg').value);gr.addColorStop(1,$('bg2').value);
+ x.fillStyle=gr;x.fillRect(0,0,W,H);
+ var d=D[$('dev').value],bz=11,fw=d.w+bz*2,fh=d.h+bz*2;
+ var s=Math.min(H*.86/fh,W*.8/fw);
+ x.save();x.translate(W/2-fw*s/2,H/2-fh*s/2);x.scale(s,s);
+ x.fillStyle=frame;
+ [[-3,150,4,40],[-3,215,4,70],[-3,300,4,70],[fw-1,240,4,100]].forEach(function(b){x.fillRect(b[0],b[1],b[2],b[3])});
+ x.shadowColor='rgba(0,0,0,.35)';x.shadowBlur=60;x.shadowOffsetY=20;
+ rr(0,0,fw,fh,d.r+bz);x.fill();
+ x.shadowColor='transparent';
+ x.lineWidth=3;x.strokeStyle='rgba(255,255,255,.28)';x.stroke();
+ x.save();rr(bz,bz,d.w,d.h,d.r);x.fillStyle='#000';x.fill();x.clip();
+ if(v.readyState>1&&v.videoWidth){
+  var k=Math.max(d.w/v.videoWidth,d.h/v.videoHeight),vw=v.videoWidth*k,vh=v.videoHeight*k;
+  x.drawImage(v,bz+(d.w-vw)/2,bz+(d.h-vh)/2,vw,vh);
+ }else{
+  x.fillStyle='#222';x.fillRect(bz,bz,d.w,d.h);
+  x.fillStyle='#888';x.font='28px system-ui';x.textAlign='center';x.fillText('Upload video',fw/2,fh/2);
+ }
+ x.restore();
+ x.fillStyle='#000';rr((fw-d.iw)/2,bz+11,d.iw,d.ih,d.ih/2);x.fill();
+ x.restore();
+ requestAnimationFrame(draw);
+}
+
+Object.keys(FR).forEach(function(n,i){
+ var b=document.createElement('button');b.className='sw'+(i?'':' on');b.title=n;b.style.background=FR[n];
+ b.onclick=function(){frame=FR[n];document.querySelectorAll('.sw').forEach(function(e){e.classList.remove('on')});b.classList.add('on')};
+ $('fc').appendChild(b);
+});
+
+function audio(){
+ if(ac)return;
+ ac=new (window.AudioContext||window.webkitAudioContext)();
+ var src=ac.createMediaElementSource(v);g=ac.createGain();dest=ac.createMediaStreamDestination();
+ src.connect(g);g.connect(ac.destination);src.connect(dest);
+}
+
+$('f').onchange=function(e){
+ var f=e.target.files[0];if(!f)return;
+ v.src=URL.createObjectURL(f);v.load();
+ v.onloadeddata=function(){audio();ac.resume();v.play().catch(function(){});$('dl').disabled=false;$('st').textContent='রেডি। ডাউনলোড চাপলে ভিডিও রেকর্ড হয়ে সেভ হবে।'};
+};
+$('pp').onclick=function(){if(!v.src)return;audio();ac.resume();v.paused?v.play():v.pause()};
+$('sz').onchange=setSize;
+
+$('dl').onclick=function(){
+ if(rec||!v.src)return;
+ if(!window.MediaRecorder){$('st').textContent='এই ব্রাউজারে রেকর্ডিং সাপোর্ট নেই। Chrome ব্যবহার করো।';return}
+ audio();ac.resume();rec=true;$('dl').disabled=true;
+ var stream=cv.captureStream(30),t=dest.stream.getAudioTracks()[0];if(t)stream.addTrack(t);
+ var mt=['video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm'].filter(function(m){return MediaRecorder.isTypeSupported(m)})[0]||'';
+ var mr=new MediaRecorder(stream,mt?{mimeType:mt,videoBitsPerSecond:8e6}:{}),ch=[];
+ mr.ondataavailable=function(e){if(e.data.size)ch.push(e.data)};
+ mr.onstop=function(){
+  var ext=mt.indexOf('mp4')>-1?'mp4':'webm';
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob(ch,{type:mt||'video/webm'}));
+  a.download='mockup.'+ext;document.body.appendChild(a);a.click();a.remove();
+  g.gain.value=1;v.loop=true;v.ontimeupdate=null;v.onended=null;rec=false;$('dl').disabled=false;
+  $('bar').style.display='none';$('st').textContent='ডাউনলোড হয়ে গেছে ('+ext+')';
+ };
+ v.loop=false;g.gain.value=0;v.currentTime=0;$('bar').style.display='block';$('st').textContent='রেকর্ড হচ্ছে... একটু অপেক্ষা করো';
+ v.ontimeupdate=function(){$('bi').style.width=(v.currentTime/v.duration*100)+'%'};
+ v.onended=function(){mr.stop()};
+ v.play().then(function(){mr.start()});
+};
+
+setSize();draw();
+</script>
+</body>
+</html>

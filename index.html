@@ -3,116 +3,132 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ভিডিও মকআপ</title>
+<title>ভিডিও ফোন মকআপ</title>
 <style>
-:root{--bg:#f4f5f7;--card:#fff;--tx:#16181d;--mu:#6b7280;--ac:#4f46e5;--bd:#e3e5ea;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101216;--card:#1a1d24;--tx:#eceef2;--mu:#9aa1ae;--ac:#818cf8;--bd:#2a2e38}}
-html{height:100%}
-body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif;min-height:100%}
-main{max-width:520px;margin:0 auto;padding:16px}
-h1{font-size:20px;margin:4px 0 14px}
-.stage{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:10px;display:flex;justify-content:center}
-canvas{max-width:100%;max-height:58vh;border-radius:10px}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px;margin-top:12px}
-label{display:block;font-size:13px;color:var(--mu);margin:10px 0 6px}
-label:first-child{margin-top:0}
-select,button,.btn{font:inherit;font-size:15px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);padding:10px 12px}
-select{width:100%}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.sw{width:34px;height:34px;border-radius:50%;border:2px solid var(--bd);padding:0;cursor:pointer}
+:root{--bg:#eef0f5;--card:#fff;--tx:#16181d;--mu:#7a808c;--ac:#4f46e5;--bd:#e1e4ea;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1014;--card:#1a1d24;--tx:#eceef2;--mu:#98a0ae;--ac:#818cf8;--bd:#2a2e38}}
+*{-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif;display:flex;flex-direction:column;overflow:hidden}
+#stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:12px;position:relative}
+canvas{max-width:100%;max-height:100%;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.18);cursor:pointer}
+#st{position:absolute;top:8px;left:50%;transform:translateX(-50%);font-size:12px;background:var(--card);border:1px solid var(--bd);color:var(--mu);padding:5px 12px;border-radius:20px;white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:ellipsis}
+#bar{height:3px;background:var(--bd);display:none}
+#bar i{display:block;height:100%;width:0;background:var(--ac)}
+#panel{background:var(--card);border-top:1px solid var(--bd);padding:10px 8px;min-height:70px}
+.pn{display:none;gap:8px;overflow-x:auto;scrollbar-width:none;align-items:center;padding:2px 4px}
+.pn.on{display:flex}
+.pn::-webkit-scrollbar{display:none}
+.ch{flex:0 0 auto;border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:12px;padding:7px 11px;font:inherit;font-size:12.5px;line-height:1.25;text-align:center;cursor:pointer}
+.ch small{display:block;font-size:10px;color:var(--mu)}
+.ch.on{border-color:var(--ac);background:var(--ac);color:#fff}
+.ch.on small{color:#e0e0ff}
+.sw{flex:0 0 auto;width:40px;height:40px;border-radius:12px;border:2px solid var(--bd);padding:0;cursor:pointer}
+.sw.c{border-radius:50%;width:36px;height:36px}
 .sw.on{outline:3px solid var(--ac);outline-offset:2px}
-input[type=color]{width:44px;height:36px;padding:0;border:1px solid var(--bd);border-radius:8px;background:none}
-.pri{background:var(--ac);color:#fff;border:0;font-weight:600;flex:1}
-.pri:disabled{opacity:.5}
-.btn{display:inline-block;text-align:center;cursor:pointer;flex:1;font-weight:600}
+input[type=color]{flex:0 0 auto;width:40px;height:40px;padding:0;border:2px solid var(--bd);border-radius:12px;background:none}
+#nav{display:flex;background:var(--card);border-top:1px solid var(--bd);padding:4px 4px 6px}
+#nav button{flex:1;background:none;border:0;color:var(--mu);font:inherit;font-size:10.5px;padding:5px 0;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+#nav button span{font-size:19px;line-height:1}
+#nav button.on{color:var(--ac);background:var(--bg)}
+#nav button.dl{color:#fff}
+#nav button.dl span{background:var(--ac);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:16px}
+#nav button.dl{color:var(--ac)}
+#nav button:disabled{opacity:.45}
 input[type=file]{display:none}
-.bar{height:6px;background:var(--bd);border-radius:3px;margin-top:10px;overflow:hidden;display:none}
-.bar i{display:block;height:100%;width:0;background:var(--ac)}
-.note{font-size:12px;color:var(--mu);margin:8px 0 0}
 </style>
 </head>
 <body>
-<main>
-<h1>📱 ভিডিও ফোন মকআপ</h1>
-<div class="stage"><canvas id="cv"></canvas></div>
-
-<div class="card">
-<div class="row">
-<label class="btn pri" style="margin:0;color:#fff">🎬 ভিডিও আপলোড<input type="file" id="f" accept="video/*"></label>
-<button id="pp">⏯ প্লে/পজ</button>
+<div id="stage"><canvas id="cv"></canvas><div id="st">ফ্রেমে ট্যাপ করে ভিডিও বেছে নাও</div></div>
+<div id="bar"><i id="bi"></i></div>
+<div id="panel">
+ <div class="pn on" id="p-phone"></div>
+ <div class="pn" id="p-tpl"></div>
+ <div class="pn" id="p-frame"></div>
+ <div class="pn" id="p-size"></div>
 </div>
-<label>ফোন মডেল</label>
-<select id="dev">
-<option value="18pm">iPhone 18 Pro Max</option>
-<option value="16pm">iPhone 16 Pro Max</option>
-<option value="15pm">iPhone 15 Pro Max</option>
-<option value="14pm">iPhone 14 Pro Max</option>
-</select>
-<label>ফ্রেমের রং</label>
-<div class="row" id="fc"></div>
-<label>ব্যাকগ্রাউন্ড</label>
-<div class="row"><input type="color" id="bg" value="#e9ecf5"><input type="color" id="bg2" value="#c7d2fe"><span class="note" style="margin:0">গ্রেডিয়েন্টের দুই রং</span></div>
-<label>আউটপুট সাইজ</label>
-<select id="sz">
-<option value="1080x1920">৯:১৬ (রিলস/শর্টস)</option>
-<option value="1080x1080">১:১ (স্কয়ার)</option>
-<option value="1920x1080">১৬:৯ (ইউটিউব)</option>
-</select>
+<div id="nav">
+ <button data-a="video"><span>🎬</span>ভিডিও</button>
+ <button data-t="phone" class="on"><span>📱</span>ফোন</button>
+ <button data-t="tpl"><span>🎨</span>টেমপ্লেট</button>
+ <button data-t="frame"><span>⚫</span>ফ্রেম</button>
+ <button data-t="size"><span>📐</span>সাইজ</button>
+ <button data-a="dl" class="dl" id="dl" disabled><span>⬇</span>ডাউনলোড</button>
 </div>
-
-<div class="card">
-<div class="row"><button class="pri" id="dl" disabled>⬇ ভিডিও ডাউনলোড</button></div>
-<div class="bar" id="bar"><i id="bi"></i></div>
-<p class="note" id="st">প্রথমে একটা ভিডিও আপলোড করো।</p>
-<p class="note">ডাউনলোডের সময় ভিডিওটা শুরু থেকে শেষ পর্যন্ত রেকর্ড হয়, তাই ভিডিও যত লম্বা সময়ও তত লাগবে। রেকর্ড চলাকালীন ট্যাব খোলা রাখো।</p>
-</div>
-</main>
+<input type="file" id="f" accept="video/*">
 <script>
-var D={
-'18pm':{w:440,h:956,r:64,iw:104,ih:32},
-'16pm':{w:440,h:956,r:62,iw:120,ih:35},
-'15pm':{w:430,h:932,r:55,iw:120,ih:35},
-'14pm':{w:430,h:932,r:55,iw:120,ih:35}};
-var FR={'ব্ল্যাক':'#1c1c1f','সিলভার':'#d8d9dc','ন্যাচারাল':'#b9ada0','ব্লু':'#3b4a5f','ডেজার্ট':'#c9a98a'};
+var DEV=[
+{n:'iPhone 18 Pro Max',t:'i',w:440,h:956,r:64,iw:104,ih:32},
+{n:'iPhone 17 Pro Max',t:'i',w:440,h:956,r:62,iw:116,ih:34},
+{n:'iPhone 16 Pro Max',t:'i',w:440,h:956,r:62,iw:120,ih:35},
+{n:'iPhone 16',t:'i',w:393,h:852,r:55,iw:120,ih:35},
+{n:'iPhone 15 Pro Max',t:'i',w:430,h:932,r:55,iw:120,ih:35},
+{n:'iPhone 14 Pro Max',t:'i',w:430,h:932,r:55,iw:120,ih:35},
+{n:'Galaxy S25 Ultra',t:'a',w:412,h:892,r:26},
+{n:'Pixel 9 Pro',t:'a',w:412,h:915,r:48}];
+var TPL=[['#eef1fb','#c7d2fe'],['#ff9a9e','#fad0c4'],['#667eea','#764ba2'],['#0f2027','#2c5364'],['#f6d365','#fda085'],['#43e97b','#38f9d7'],['#fa709a','#fee140'],['#000000','#434343'],['#ffffff','#e5e7eb'],['#8e2de2','#4a00e0'],['#ff0844','#ffb199'],['#1e3c72','#2a5298']];
+var FR=[['ব্ল্যাক','#1c1c1f'],['সিলভার','#d8d9dc'],['ন্যাচারাল','#b9ada0'],['ব্লু','#3b4a5f'],['ডেজার্ট','#c9a98a'],['হোয়াইট','#f3f3f1'],['পার্পল','#6d5a8c']];
+var SZ=[['অরিজিনাল','সোর্স কোয়ালিটি',0,0],['Facebook ফিড','৪:৫',1080,1350],['Facebook Reels','৯:১৬',1080,1920],['TikTok','৯:১৬',1080,1920],['Instagram Reels','৯:১৬',1080,1920],['YouTube Shorts','৯:১৬',1080,1920],['YouTube','১৬:৯',1920,1080],['Instagram পোস্ট','১:১',1080,1080],['X / Twitter','১৬:৯',1280,720]];
+var di=0,ti=0,fi=0,si=0,c1=TPL[0][0],c2=TPL[0][1],frame=FR[0][1],W=1080,H=1920,rec=false,ac,g,dest;
 var cv=document.getElementById('cv'),x=cv.getContext('2d');
 var v=document.createElement('video');v.playsInline=true;v.loop=true;v.preload='auto';
-var W=1080,H=1920,frame='#1c1c1f',ac,g,dest,rec=false;
 var $=function(i){return document.getElementById(i)};
+function pick(p,i,fn){var ch=$(p).children;for(var k=0;k<ch.length;k++)ch[k].classList.toggle('on',k==i);fn&&fn()}
 
-function setSize(){var s=$('sz').value.split('x');W=+s[0];H=+s[1];cv.width=W;cv.height=H}
-function rr(a,b,w,h,r){x.beginPath();x.roundRect(a,b,w,h,r)}
-
-function draw(){
- var gr=x.createLinearGradient(0,0,W,H);gr.addColorStop(0,$('bg').value);gr.addColorStop(1,$('bg2').value);
- x.fillStyle=gr;x.fillRect(0,0,W,H);
- var d=D[$('dev').value],bz=11,fw=d.w+bz*2,fh=d.h+bz*2;
- var s=Math.min(H*.86/fh,W*.8/fw);
- x.save();x.translate(W/2-fw*s/2,H/2-fh*s/2);x.scale(s,s);
- x.fillStyle=frame;
- [[-3,150,4,40],[-3,215,4,70],[-3,300,4,70],[fw-1,240,4,100]].forEach(function(b){x.fillRect(b[0],b[1],b[2],b[3])});
- x.shadowColor='rgba(0,0,0,.35)';x.shadowBlur=60;x.shadowOffsetY=20;
- rr(0,0,fw,fh,d.r+bz);x.fill();
- x.shadowColor='transparent';
- x.lineWidth=3;x.strokeStyle='rgba(255,255,255,.28)';x.stroke();
- x.save();rr(bz,bz,d.w,d.h,d.r);x.fillStyle='#000';x.fill();x.clip();
- if(v.readyState>1&&v.videoWidth){
-  var k=Math.max(d.w/v.videoWidth,d.h/v.videoHeight),vw=v.videoWidth*k,vh=v.videoHeight*k;
-  x.drawImage(v,bz+(d.w-vw)/2,bz+(d.h-vh)/2,vw,vh);
- }else{
-  x.fillStyle='#222';x.fillRect(bz,bz,d.w,d.h);
-  x.fillStyle='#888';x.font='28px system-ui';x.textAlign='center';x.fillText('Upload video',fw/2,fh/2);
+function bz(d){return d.t=='i'?11:9}
+function applySize(){
+ var z=SZ[si],d=DEV[di];
+ if(z[2]){W=z[2];H=z[3]}
+ else{
+  var vw=v.videoWidth||1080,vh=v.videoHeight||1920,b=bz(d),s=Math.min(vw/d.w,vh/d.h);
+  W=(d.w+2*b)*s*1.25;H=(d.h+2*b)*s*1.12;
+  var m=Math.max(W,H);if(m>2560){W*=2560/m;H*=2560/m}
+  W=Math.round(W/2)*2;H=Math.round(H/2)*2;
  }
- x.restore();
- x.fillStyle='#000';rr((fw-d.iw)/2,bz+11,d.iw,d.ih,d.ih/2);x.fill();
- x.restore();
- requestAnimationFrame(draw);
+ cv.width=W;cv.height=H;
 }
 
-Object.keys(FR).forEach(function(n,i){
- var b=document.createElement('button');b.className='sw'+(i?'':' on');b.title=n;b.style.background=FR[n];
- b.onclick=function(){frame=FR[n];document.querySelectorAll('.sw').forEach(function(e){e.classList.remove('on')});b.classList.add('on')};
- $('fc').appendChild(b);
-});
+function rr(a,b,w,h,r){x.beginPath();x.roundRect(a,b,w,h,r)}
+function render(){
+ x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';
+ var gr=x.createLinearGradient(0,0,W,H);gr.addColorStop(0,c1);gr.addColorStop(1,c2);
+ x.fillStyle=gr;x.fillRect(0,0,W,H);
+ var d=DEV[di],b=bz(d),fw=d.w+b*2,fh=d.h+b*2,s=Math.min(H*.9/fh,W*.88/fw);
+ x.save();x.translate(W/2-fw*s/2,H/2-fh*s/2);x.scale(s,s);
+ x.fillStyle=frame;
+ [[-3,150,4,40],[-3,215,4,70],[-3,300,4,70],[fw-1,240,4,100]].forEach(function(k){x.fillRect(k[0],k[1],k[2],k[3])});
+ x.shadowColor='rgba(0,0,0,.35)';x.shadowBlur=60;x.shadowOffsetY=20;
+ rr(0,0,fw,fh,d.r+b);x.fill();
+ x.shadowColor='transparent';x.lineWidth=3;x.strokeStyle='rgba(255,255,255,.28)';x.stroke();
+ x.save();rr(b,b,d.w,d.h,d.r);x.fillStyle='#000';x.fill();x.clip();
+ if(v.readyState>1&&v.videoWidth){
+  var k=Math.max(d.w/v.videoWidth,d.h/v.videoHeight),vw=v.videoWidth*k,vh=v.videoHeight*k;
+  x.drawImage(v,b+(d.w-vw)/2,b+(d.h-vh)/2,vw,vh);
+ }else{
+  x.fillStyle='#17181c';x.fillRect(b,b,d.w,d.h);
+  x.fillStyle='#8b90a0';x.textAlign='center';
+  x.font='300 70px system-ui';x.fillText('+',fw/2,fh/2-6);
+  x.font='22px system-ui,"Noto Sans Bengali"';x.fillText('ভিডিও আপলোড',fw/2,fh/2+34);
+ }
+ x.restore();
+ x.fillStyle='#000';
+ if(d.t=='i'){rr((fw-d.iw)/2,b+11,d.iw,d.ih,d.ih/2);x.fill()}
+ else{x.beginPath();x.arc(fw/2,b+17,8,0,7);x.fill()}
+ x.restore();
+}
+(function loop(){render();requestAnimationFrame(loop)})();
+
+DEV.forEach(function(d,i){var e=document.createElement('button');e.className='ch'+(i?'':' on');e.innerHTML=d.n.replace(/^(iPhone|Galaxy|Pixel)\s/,'<small>$1</small>');e.onclick=function(){di=i;pick('p-phone',i,applySize)};$('p-phone').appendChild(e)});
+TPL.forEach(function(t,i){var e=document.createElement('button');e.className='sw'+(i?'':' on');e.style.background='linear-gradient(135deg,'+t[0]+','+t[1]+')';e.onclick=function(){c1=t[0];c2=t[1];pick('p-tpl',i)};$('p-tpl').appendChild(e)});
+['c1','c2'].forEach(function(n,j){var e=document.createElement('input');e.type='color';e.value=TPL[0][j];e.oninput=function(){window[n]=e.value;pick('p-tpl',-1)};$('p-tpl').appendChild(e)});
+FR.forEach(function(f,i){var e=document.createElement('button');e.className='sw c'+(i?'':' on');e.title=f[0];e.style.background=f[1];e.onclick=function(){frame=f[1];pick('p-frame',i)};$('p-frame').appendChild(e)});
+SZ.forEach(function(z,i){var e=document.createElement('button');e.className='ch'+(i?'':' on');e.innerHTML=z[0]+'<small>'+z[1]+'</small>';e.onclick=function(){si=i;pick('p-size',i,applySize)};$('p-size').appendChild(e)});
+
+function tab(t){
+ document.querySelectorAll('#nav [data-t]').forEach(function(b){b.classList.toggle('on',b.dataset.t==t)});
+ document.querySelectorAll('.pn').forEach(function(p){p.classList.toggle('on',p.id=='p-'+t)});
+}
+document.querySelectorAll('#nav [data-t]').forEach(function(b){b.onclick=function(){tab(b.dataset.t)}});
 
 function audio(){
  if(ac)return;
@@ -120,37 +136,50 @@ function audio(){
  var src=ac.createMediaElementSource(v);g=ac.createGain();dest=ac.createMediaStreamDestination();
  src.connect(g);g.connect(ac.destination);src.connect(dest);
 }
-
 $('f').onchange=function(e){
  var f=e.target.files[0];if(!f)return;
  v.src=URL.createObjectURL(f);v.load();
- v.onloadeddata=function(){audio();ac.resume();v.play().catch(function(){});$('dl').disabled=false;$('st').textContent='রেডি। ডাউনলোড চাপলে ভিডিও রেকর্ড হয়ে সেভ হবে।'};
+ v.onloadeddata=function(){
+  audio();ac.resume();applySize();v.play().catch(function(){});
+  $('dl').disabled=false;$('st').textContent='ফ্রেমে ট্যাপ করলে প্লে/পজ হবে';
+ };
+ e.target.value='';
 };
-$('pp').onclick=function(){if(!v.src)return;audio();ac.resume();v.paused?v.play():v.pause()};
-$('sz').onchange=setSize;
+cv.onclick=function(){
+ if(!v.src){$('f').click();return}
+ audio();ac.resume();v.paused?v.play():v.pause();
+};
+document.querySelector('[data-a=video]').onclick=function(){$('f').click()};
 
-$('dl').onclick=function(){
+$('dl').onclick=async function(){
  if(rec||!v.src)return;
- if(!window.MediaRecorder){$('st').textContent='এই ব্রাউজারে রেকর্ডিং সাপোর্ট নেই। Chrome ব্যবহার করো।';return}
- audio();ac.resume();rec=true;$('dl').disabled=true;
+ if(!window.MediaRecorder){$('st').textContent='এই ব্রাউজারে রেকর্ডিং নেই, Chrome ব্যবহার করো';return}
+ audio();await ac.resume();rec=true;$('dl').disabled=true;
+ v.pause();v.loop=false;g.gain.value=0;
+ if(v.currentTime>0.01)await new Promise(function(r){v.onseeked=r;v.currentTime=0});
+ v.onseeked=null;
+ render();
+ await new Promise(function(r){requestAnimationFrame(function(){requestAnimationFrame(r)})});
  var stream=cv.captureStream(30),t=dest.stream.getAudioTracks()[0];if(t)stream.addTrack(t);
  var mt=['video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm'].filter(function(m){return MediaRecorder.isTypeSupported(m)})[0]||'';
- var mr=new MediaRecorder(stream,mt?{mimeType:mt,videoBitsPerSecond:8e6}:{}),ch=[];
+ var bps=Math.min(40e6,Math.max(8e6,W*H*30*.2));
+ var mr=new MediaRecorder(stream,mt?{mimeType:mt,videoBitsPerSecond:bps}:{videoBitsPerSecond:bps}),ch=[];
  mr.ondataavailable=function(e){if(e.data.size)ch.push(e.data)};
  mr.onstop=function(){
   var ext=mt.indexOf('mp4')>-1?'mp4':'webm';
   var a=document.createElement('a');a.href=URL.createObjectURL(new Blob(ch,{type:mt||'video/webm'}));
   a.download='mockup.'+ext;document.body.appendChild(a);a.click();a.remove();
   g.gain.value=1;v.loop=true;v.ontimeupdate=null;v.onended=null;rec=false;$('dl').disabled=false;
-  $('bar').style.display='none';$('st').textContent='ডাউনলোড হয়ে গেছে ('+ext+')';
+  $('bar').style.display='none';$('st').textContent='ডাউনলোড হয়েছে ('+ext+', '+W+'x'+H+')';
+  v.currentTime=0;v.play().catch(function(){});
  };
- v.loop=false;g.gain.value=0;v.currentTime=0;$('bar').style.display='block';$('st').textContent='রেকর্ড হচ্ছে... একটু অপেক্ষা করো';
+ $('bar').style.display='block';$('st').textContent='রেকর্ড হচ্ছে, ট্যাব খোলা রাখো...';
  v.ontimeupdate=function(){$('bi').style.width=(v.currentTime/v.duration*100)+'%'};
- v.onended=function(){mr.stop()};
- v.play().then(function(){mr.start()});
+ v.onended=function(){setTimeout(function(){mr.stop()},200)};
+ mr.start();
+ v.play();
 };
-
-setSize();draw();
+applySize();
 </script>
 </body>
 </html>
